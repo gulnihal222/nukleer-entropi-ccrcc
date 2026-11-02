@@ -1,0 +1,28 @@
+# Slaytlar ve büyük veri (GitHub'a yüklenmez)
+02_raw_data/wsi/
+02_raw_data/monuseg/
+*.svs
+*.ndpi
+*.mrxs
+*.tif
+*.tiff
+scripts/gdc-client
+scripts/gdc-client.exe
+gdc-client*.zip
+
+# Analiz çıktıları (çalıştırınca yeniden üretilir)
+03_preprocessed_images/
+04_segmentation/
+05_morphometry/
+06_entropy/
+07_statistics/
+08_figures/
+09_results/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.DS_Store
