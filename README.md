@@ -1,5 +1,7 @@
 # H&E Boyalı Tümör Dokularında Nükleer Morfometrik Entropi Analizi
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24142864.svg)](https://doi.org/10.5281/zenodo.24142864)
+
 TÜBİTAK 2209-A Üniversite Öğrencileri Araştırma Projeleri Destek Programı kapsamında yürütülen projenin analiz kodları.
 
 **Proje yürütücüsü:** Gülnihal Kelkit
@@ -226,4 +228,6 @@ Ek bağımlılıklar: `lifelines` (R3), `idc-index` (R2). CPTAC DICOM slaytları
 
 ## Lisans ve atıf
 
-Kod MIT lisansı ile paylaşılmıştır (`LICENSE`). Atıf bilgisi için `CITATION.cff` dosyasına bakınız.
+Kod MIT lisansı ile paylaşılmıştır (`LICENSE`). Kalıcı arşiv: Zenodo, DOI [10.5281/zenodo.24142864](https://doi.org/10.5281/zenodo.24142864).
+
+Atıf: Kelkit G. *Nükleer morfometrik entropi analizi (TCGA-KIRC, CPTAC-CCRCC) — analiz kodları* (v1.0.0). Zenodo; 2026. doi:10.5281/zenodo.24142864
