@@ -53,7 +53,7 @@ import pandas as pd
 PIPELINE_VERSION = "3.0.0"
 SEG_VERSION = "2.0"       # segmentasyon/özellik kodu değişince artırılır → 1. aşama yeniden
 ENTROPY_VERSION = "2.0"   # entropi kodu değişince artırılır → yalnız 2. aşama yeniden
-SUPPORTED_WSI_EXT = {".svs", ".tif", ".tiff", ".ndpi", ".mrxs", ".scn", ".vms", ".vmu", ".bif", ".svslide"}
+SUPPORTED_WSI_EXT = {".svs", ".tif", ".tiff", ".ndpi", ".mrxs", ".scn", ".vms", ".vmu", ".bif", ".svslide", ".dcm"}  # .dcm: DICOM-WSI (OpenSlide ≥4)
 SUPPORTED_ARRAY_EXT = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 # TCGA slide barcode: TCGA-BP-4165-01A-01-BS1  (BP = doku kaynak merkezi / TSS)

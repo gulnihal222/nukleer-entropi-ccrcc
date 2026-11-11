@@ -34,6 +34,14 @@ Komutlar (sırasıyla):
   python scripts/proje.py toplu --onay         # 200 vaka: indir → analiz → sil
   python scripts/proje.py yedek-sec            # 20x vakalar yerine aynı grade'den rastgele yedek (kurala göre)
   python scripts/proje.py istatistik           # testler + figürler + klasörlere dağıtım
+
+Revizyon (makale) komutları:
+  python scripts/proje.py uzamsal-ozgulluk     # R1: uzamsal kazanç entropiye mi özgü? (tile alan SD'si ile)
+  python scripts/proje.py tumor-cekirdek       # R4: lenfosit benzeri + iğsi çekirdekler dışlanınca bulgular
+  python scripts/proje.py sagkalim             # R3: OS/DSS Cox (evre, grade, yaş düzeltmeli), TCGA-CDR
+  python scripts/proje.py cptac-envanter       # R2: CPTAC-CCRCC slayt + grade listesi (indirme yok)
+  python scripts/proje.py cptac-analiz --limit 2   # R2: önce 2 hastalık deneme, sonra --limit olmadan tümü
+  python scripts/proje.py cptac-istatistik     # R2: CPTAC'ta birincil + uzamsal analizler
 """
 from __future__ import annotations
 
@@ -706,6 +714,101 @@ def yogunluk_duyarlilik(esikler=(100, 150), cikar=("TCGA-CZ-5455",)):
     print(f"\n✓ {dst}")
 
 
+REVIZYON = ROOT / "07_statistics" / "revizyon"
+
+
+def uzamsal_ozgulluk():
+    """R1 (revizyon): Uzamsal kazanç entropiye mi özgü? Tile alan entropisi yerine tile alan SD'si / CV'si."""
+    import kirc_stats as ks
+    import kirc_revizyon as kr
+    a = ayarlar()
+    cfg = pipeline_cfg(a)
+    ana, _, _ = ks.load_analysis_set(RESULTS, yol(a["excel"]))
+    REVIZYON.mkdir(parents=True, exist_ok=True)
+    baslik(f"R1 — UZAMSAL ÖZGÜLLÜK ({len(ana)} hasta; çekirdek tablolarından, slayt indirilmez)")
+    _, txt = kr.r1_calistir(ana, RESULTS, cfg, REVIZYON / "R1_uzamsal_ozgulluk.xlsx",
+                            ROOT / "08_figures" / "fig16_uzamsal_ozgulluk.png", REVIZYON / "R1_vaka_uzamsal_olcutler.csv")
+    (REVIZYON / "R1_ozet.txt").write_text(txt, encoding="utf-8")
+    print(f"\n✓ {REVIZYON / 'R1_uzamsal_ozgulluk.xlsx'}\n✓ {ROOT / '08_figures' / 'fig16_uzamsal_ozgulluk.png'}"
+          f"\n✓ {REVIZYON / 'R1_ozet.txt'}  ← bu dosyanın içeriğini Claude'a gönder")
+
+
+def tumor_cekirdek():
+    """R4 (revizyon): Yalnız tümör çekirdekleri — lenfosit benzeri ve iğsi çekirdekler dışlanınca bulgular."""
+    import kirc_stats as ks
+    import kirc_revizyon as kr
+    a = ayarlar()
+    cfg = pipeline_cfg(a)
+    ana, _, _ = ks.load_analysis_set(RESULTS, yol(a["excel"]))
+    REVIZYON.mkdir(parents=True, exist_ok=True)
+    baslik(f"R4 — YALNIZ TÜMÖR ÇEKİRDEKLERİ ({len(ana)} hasta; çekirdek tablolarından)")
+    _, txt = kr.r4_calistir(ana, RESULTS, cfg, REVIZYON / "R4_tumor_cekirdek.xlsx",
+                            ROOT / "08_figures" / "fig17_tumor_cekirdek.png")
+    (REVIZYON / "R4_ozet.txt").write_text(txt, encoding="utf-8")
+    print(f"\n✓ {REVIZYON / 'R4_tumor_cekirdek.xlsx'}\n✓ {ROOT / '08_figures' / 'fig17_tumor_cekirdek.png'}"
+          f"\n✓ {REVIZYON / 'R4_ozet.txt'}  ← bu dosyanın içeriğini Claude'a gönder")
+
+
+def sagkalim(dosya: str | None = None):
+    """R3 (revizyon): TCGA-KIRC genel ve hastalığa özgü sağkalım (TCGA-CDR), evre/grade/yaşa göre düzeltilmiş Cox."""
+    import kirc_stats as ks
+    import kirc_revizyon as kr
+    a = ayarlar()
+    ana, _, _ = ks.load_analysis_set(RESULTS, yol(a["excel"]))
+    REVIZYON.mkdir(parents=True, exist_ok=True)
+    baslik(f"R3 — SAĞKALIM ({len(ana)} hasta; TCGA-CDR)")
+    cdr = Path(dosya) if dosya else kr.cdr_indir(ROOT / "02_raw_data")
+    _, txt = kr.r3_calistir(ana, cdr, REVIZYON / "R3_sagkalim.xlsx", ROOT / "08_figures" / "fig18_sagkalim.png")
+    (REVIZYON / "R3_ozet.txt").write_text(txt, encoding="utf-8")
+    print(f"\n✓ {REVIZYON / 'R3_sagkalim.xlsx'}\n✓ {ROOT / '08_figures' / 'fig18_sagkalim.png'}"
+          f"\n✓ {REVIZYON / 'R3_ozet.txt'}  ← bu dosyanın içeriğini Claude'a gönder")
+
+
+CPTAC_DIR = ROOT / "09_results" / "cptac"
+CPTAC_ENV = ROOT / "02_raw_data" / "cptac_envanter.xlsx"
+
+
+def _cptac_cfg():
+    import kirc_revizyon as kr
+    if not (RESULTS / "analysis_config.json").exists():
+        raise SystemExit("Ana analizin ayar dosyası yok (09_results/pipeline/analysis_config.json).")
+    kp.setup_logging(CPTAC_DIR)
+    return kp.load_config(CPTAC_DIR, RESULTS / "analysis_config.json", {"target_mpp": kr.CPTAC_MPP})
+
+
+def cptac_envanter():
+    """R2 (revizyon): CPTAC-CCRCC slayt + grade envanteri (IDC + GDC); indirme yapılmaz."""
+    import kirc_revizyon as kr
+    REVIZYON.mkdir(parents=True, exist_ok=True)
+    baslik("R2 — CPTAC-CCRCC ENVANTERİ (IDC görüntüleri + GDC CPTAC-3 grade)")
+    _, txt = kr.cptac_envanter(CPTAC_ENV)
+    (REVIZYON / "R2_envanter.txt").write_text(txt, encoding="utf-8")
+    print(f"\n✓ {CPTAC_ENV}\n✓ {REVIZYON / 'R2_envanter.txt'}  ← bu dosyanın içeriğini Claude'a gönder")
+
+
+def cptac_analiz(limit=None):
+    """R2: seçilen CPTAC slaytlarını sırayla indirir (IDC), 0.5 µm/px'te analiz eder, siler. Kaldığı yerden devam eder."""
+    import kirc_revizyon as kr
+    if not CPTAC_ENV.exists():
+        raise SystemExit("Önce: python scripts/proje.py cptac-envanter")
+    cfg = _cptac_cfg()
+    baslik(f"R2 — CPTAC ANALİZİ ({'ilk ' + str(limit) if limit else 'tüm'} hasta; 0.5 µm/px) → {CPTAC_DIR.relative_to(ROOT)}")
+    kr.cptac_analiz(CPTAC_ENV, CPTAC_DIR, ROOT / "02_raw_data" / "cptac_gecici", cfg, limit)
+    print(f"\n✓ Sonuçlar: {CPTAC_DIR}. Bitince: python scripts/proje.py cptac-istatistik")
+
+
+def cptac_istatistik():
+    """R2: CPTAC'ta birincil ilişkiler + uzamsal artımsal değer + uzamsal özgüllük."""
+    import kirc_revizyon as kr
+    cfg = _cptac_cfg()
+    REVIZYON.mkdir(parents=True, exist_ok=True)
+    baslik("R2 — CPTAC-CCRCC İSTATİSTİK")
+    txt = kr.cptac_istatistik(CPTAC_DIR, cfg, REVIZYON / "R2_cptac.xlsx", REVIZYON / "R2_cptac_uzamsal.xlsx",
+                              ROOT / "08_figures" / "fig19_cptac_uzamsal.png", REVIZYON / "R2_cptac_vaka_uzamsal.csv")
+    (REVIZYON / "R2_ozet.txt").write_text(txt, encoding="utf-8")
+    print(f"\n✓ {REVIZYON / 'R2_cptac.xlsx'}\n✓ {REVIZYON / 'R2_ozet.txt'}  ← bu dosyanın içeriğini Claude'a gönder")
+
+
 def dogrulama_hazirla():
     a = ayarlar()
     import kirc_validate as kv
@@ -944,6 +1047,12 @@ def main(argv=None):
     sub.add_parser("yedek-sec")
     sub.add_parser("stardist-ayar")
     sub.add_parser("yogunluk-duyarlilik")
+    sub.add_parser("uzamsal-ozgulluk")
+    sub.add_parser("tumor-cekirdek")
+    p = sub.add_parser("sagkalim"); p.add_argument("--dosya")
+    sub.add_parser("cptac-envanter")
+    p = sub.add_parser("cptac-analiz"); p.add_argument("--limit", type=int)
+    sub.add_parser("cptac-istatistik")
     p = sub.add_parser("tile-incele"); p.add_argument("vaka"); p.add_argument("--n", type=int, default=6)
     a = ap.parse_args(argv)
     if a.cmd != "kurulum" and not CFG_FILE.exists():
@@ -953,7 +1062,8 @@ def main(argv=None):
      "dogrulama-degerlendir": dogrulama_degerlendir, "ayarla": lambda: ayarla(a.anahtar, a.deger),
      "toplu": lambda: toplu(a.onay, a.limit), "istatistik": istatistik, "topla": topla,
      "dx-gecis": dx_gecis, "dondurulmus-karsilastir": dondurulmus_karsilastir,
-     "cozunurluk-duyarlilik": cozunurluk_duyarlilik, "monuseg": monuseg, "hiz-testi": hiz_testi, "yedek-sec": yedek_sec, "stardist-ayar": stardist_ayar, "yogunluk-duyarlilik": yogunluk_duyarlilik,
+     "cozunurluk-duyarlilik": cozunurluk_duyarlilik, "monuseg": monuseg, "hiz-testi": hiz_testi, "yedek-sec": yedek_sec, "stardist-ayar": stardist_ayar, "yogunluk-duyarlilik": yogunluk_duyarlilik, "uzamsal-ozgulluk": uzamsal_ozgulluk, "tumor-cekirdek": tumor_cekirdek, "sagkalim": lambda: sagkalim(a.dosya), "cptac-envanter": cptac_envanter,
+     "cptac-analiz": lambda: cptac_analiz(a.limit), "cptac-istatistik": cptac_istatistik,
      "tile-incele": lambda: tile_incele(a.vaka, a.n)}[a.cmd]()
 
 

@@ -19,6 +19,7 @@ hesaplar ve bu entropiyi tümör derecesiyle (grade) karşılaştırır. Yöntem
 | `scripts/proje.py` | Tek giriş noktası. Projedeki tüm adımlar bu dosyanın komutlarıyla sırayla çalıştırılır. |
 | `scripts/kirc_entropy_pipeline.py` | Görüntü analizi: Excel/ID doğrulama, GDC'den indirme, doku maskesi, kalem ve odak kontrolü, boya taraması, Macenko normalizasyonu, segmentasyon (klasik veya StarDist), morfometri, entropi. |
 | `scripts/kirc_validate.py` | Segmentasyon doğrulaması: MoNuSeg ve QuPath etiketleriyle F1, Dice, PQ ve entropi hatası, eşik ayarı. |
+| `scripts/kirc_revizyon.py` | Makale revizyon analizleri: uzamsal özgüllük (R1), CPTAC-CCRCC dış doğrulama (R2), sağkalım (R3), yalnız tümör çekirdekleri (R4). |
 | `scripts/kirc_stats.py` | İstatistik ve figürler: Mann-Whitney U, Spearman, Kruskal-Wallis, lojistik regresyon, merkez etkisi (van Elteren), ROC ve çapraz doğrulamalı AUC, artımsal değer, duyarlılık analizleri. |
 | `scripts/requirements.txt` | Gerekli Python paketleri. |
 | `proje_ayarlari.json` | Rapordaki ana analizde kullanılan ayarlar (StarDist, 0,25 µm/piksel, slayt başına en fazla 500 tile). |
@@ -189,9 +190,40 @@ dosyalarındadır. Segmentasyon örnekleri her vaka için `qc_segmentation_examp
 * Doku maskesi tümör, stroma ve nekrozu ayırmaz. Lenfosit ve endotel çekirdekleri de ölçüme girer (raporda kısıtlılık olarak belirtilmiştir).
 * TCGA görüntüleri GDC Veri Portalı'ndan açık erişimle indirilir. MoNuSeg verisi CC BY-NC-SA 4.0 lisanslıdır.
 
+## 9. Revizyon analizleri (makale hazırlığı)
+
+Ana analiz (bölüm 2) tamamlandıktan sonra çalıştırılır. R1, R3 ve R4 kayıtlı çekirdek tablolarını kullanır, slayt indirmez.
+
+```bash
+python scripts/proje.py uzamsal-ozgulluk      # R1: uzamsal kazanç entropiye mi özgü? (tile alan SD'si / CV'si ile karşılaştırma)
+python scripts/proje.py tumor-cekirdek        # R4: lenfosit benzeri ve iğsi çekirdekler dışlanınca bulgular
+python scripts/proje.py sagkalim              # R3: OS / DSS / PFI, evre-grade-yaş düzeltmeli Cox (TCGA-CDR)
+python scripts/proje.py cptac-envanter        # R2: CPTAC-CCRCC slayt ve grade listesi (IDC + GDC CPTAC-3)
+python scripts/proje.py cptac-analiz --limit 2   # R2: önce deneme; sonra --limit olmadan (222 hasta, ~1 gün)
+python scripts/proje.py cptac-istatistik      # R2: CPTAC'ta birincil ilişkiler + uzamsal analizler
+```
+
+Çıktılar `07_statistics/revizyon/` (Excel + özet metin) ve `08_figures/fig16–fig19` altına yazılır.
+
+| Analiz | Veri | Önceden belirlenen kural |
+|---|---|---|
+| R1 Uzamsal özgüllük | TCGA çekirdek tabloları | Tile (≥30 çekirdek) düzeyinde alan entropisi, alan SD'si ve CV'si; vaka ölçütü tile'lar arası SD ve p90. Karar: entropi SD'nin üstüne bilgi ekliyorsa (LR p<0,05) ve tersi değilse "entropiye özgü". |
+| R2 Dış doğrulama | CPTAC-CCRCC, 221 hasta (IDC, DICOM-WSI) | Tüm slaytlar 20x olduğundan 0,5 µm/piksel modunda analiz (tile fiziksel boyutu ve bin kenarları aynı); TCGA katsayıları taşınmaz, ilişkiler kohort içinde test edilir. |
+| R3 Prognoz | TCGA-CDR (Liu ve ark., 2018) | Cox, HR 1 SD başına; düzeltme: evre III–IV, grade High, yaş. ΔC-indeksi out-of-bag bootstrap. |
+| R4 Tümör çekirdekleri | TCGA çekirdek tabloları | Lenfosit benzeri: alan ≤30 µm², eksantrisite ≤0,65, H yoğunluğu ≥ slayt %70'liği, 12 µm içinde ≥3 küçük komşu. Doğrulanmış sınıflandırıcı değildir; duyarlılık analizidir. |
+
+Ek bağımlılıklar: `lifelines` (R3), `idc-index` (R2). CPTAC DICOM slaytları OpenSlide ≥ 4.0 ile okunur.
+
 ## Kaynak veri ve yöntemler
 
 * Cancer Genome Atlas Research Network (2013). Comprehensive molecular characterization of clear cell renal cell carcinoma. *Nature*, 499, 43-49.
 * Kumar ve ark. (2017). A dataset and a technique for generalized nuclear segmentation for computational pathology. *IEEE TMI*, 36(7), 1550-1560.
 * Macenko ve ark. (2009). A method for normalizing histology slides for quantitative analysis. *ISBI 2009*, 1107-1110.
 * Schmidt, Weigert, Broaddus ve Myers (2018). Cell detection with star-convex polygons. *MICCAI 2018*, 265-273.
+* Liu ve ark. (2018). An integrated TCGA pan-cancer clinical data resource to drive high-quality survival outcome analytics. *Cell*, 173(2), 400-416.
+* Clark ve ark. (2019). Integrated proteogenomic characterization of clear cell renal cell carcinoma. *Cell*, 179(4), 964-983.
+* Fedorov ve ark. (2021). NCI Imaging Data Commons. *Cancer Research*, 81(16), 4188-4193.
+
+## Lisans ve atıf
+
+Kod MIT lisansı ile paylaşılmıştır (`LICENSE`). Atıf bilgisi için `CITATION.cff` dosyasına bakınız.

@@ -10,6 +10,10 @@ scripts/gdc-client
 scripts/gdc-client.exe
 gdc-client*.zip
 
+*.dcm
+02_raw_data/cptac_gecici/
+02_raw_data/TCGA-CDR*.xlsx
+
 # Analiz çıktıları (çalıştırınca yeniden üretilir)
 03_preprocessed_images/
 04_segmentation/

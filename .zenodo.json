@@ -1,0 +1,27 @@
+{
+  "title": "Nükleer morfometrik entropi analizi (TCGA-KIRC, CPTAC-CCRCC) — analiz kodları",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Kelkit, Gülnihal",
+      "affiliation": "Biruni Üniversitesi"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Parlayan, Cüneyd",
+      "affiliation": "Biruni Üniversitesi",
+      "type": "Supervisor"
+    }
+  ],
+  "description": "H&E tüm slayt görüntülerinde StarDist ile çekirdek segmentasyonu, çekirdek alanı/çevresi/daireselliği/eksantrisitesinin Shannon entropisi ve tümör derecesiyle ilişkisi. TCGA-KIRC (200 hasta) ana analizi; CPTAC-CCRCC (221 hasta) dış doğrulama; sağkalım ve duyarlılık analizleri. TÜBİTAK 2209-A projesi.",
+  "keywords": [
+    "digital pathology",
+    "Shannon entropy",
+    "nuclear morphometry",
+    "clear cell renal cell carcinoma",
+    "TCGA-KIRC",
+    "CPTAC-CCRCC"
+  ]
+}

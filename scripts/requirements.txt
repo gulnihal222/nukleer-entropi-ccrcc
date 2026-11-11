@@ -16,3 +16,6 @@ pyarrow>=14             # MoNuSeg doğrulama verisini okumak için
 # --- Ana analizde kullanılan segmentasyon (StarDist 2D_versatile_he) ---
 stardist>=0.9
 tensorflow>=2.15        # GPU yoksa tensorflow-cpu da olur
+# --- Revizyon: sağkalım analizi (R3) ---
+lifelines>=0.27
+idc-index>=0.8          # Revizyon R2: CPTAC-CCRCC görüntüleri (NCI Imaging Data Commons)

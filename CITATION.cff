@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Bu yazılımı kullanırsanız lütfen aşağıdaki şekilde atıf yapınız."
+title: "Nükleer morfometrik entropi analizi: berrak hücreli böbrek karsinomunda çekirdek boyutu çeşitliliği ve tümör derecesi"
+authors:
+  - family-names: Kelkit
+    given-names: Gülnihal
+    affiliation: Biruni Üniversitesi
+version: 1.0.0
+date-released: 2026-11-11
+license: MIT
+repository-code: "https://github.com/gulnihal222/nukleer-entropi-ccrcc"
+keywords:
+  - digital pathology
+  - Shannon entropy
+  - nuclear morphometry
+  - clear cell renal cell carcinoma
+  - TCGA-KIRC
+  - CPTAC-CCRCC
