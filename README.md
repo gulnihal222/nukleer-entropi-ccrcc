@@ -4,6 +4,8 @@
 
 TÜBİTAK 2209-A Üniversite Öğrencileri Araştırma Projeleri Destek Programı kapsamında yürütülen projenin analiz kodları.
 
+> **English summary.** Analysis code for *Shannon entropy of nuclear size tracks tumour grade in clear cell renal cell carcinoma: development and external replication in two public whole-slide image cohorts* (Parlayan C, Kelkit G; submitted to *Histopathology*). The pipeline segments nuclei with StarDist on H&E whole-slide images, computes the Shannon entropy of nuclear area, perimeter, circularity and eccentricity, and relates it to grade in TCGA-KIRC (200 patients, development) and CPTAC-CCRCC (221 patients, external replication). Entry point: `scripts/proje.py`. Exact package versions: `scripts/requirements_tam.txt`. Journal figures: `scripts/makale_sekilleri.py`. Normality tests: `scripts/normallik_testi.py`. The list of analysed slides and case-level measurements are in Data S1 of the article.
+
 **Proje yürütücüsü:** Gülnihal Kelkit
 **Danışman:** Dr. Öğr. Üyesi Cüneyd Parlayan
 **Kurum:** Biruni Üniversitesi
@@ -23,7 +25,10 @@ hesaplar ve bu entropiyi tümör derecesiyle (grade) karşılaştırır. Yöntem
 | `scripts/kirc_validate.py` | Segmentasyon doğrulaması: MoNuSeg ve QuPath etiketleriyle F1, Dice, PQ ve entropi hatası, eşik ayarı. |
 | `scripts/kirc_revizyon.py` | Makale revizyon analizleri: uzamsal özgüllük (R1), CPTAC-CCRCC dış doğrulama (R2), sağkalım (R3), yalnız tümör çekirdekleri (R4). |
 | `scripts/kirc_stats.py` | İstatistik ve figürler: Mann-Whitney U, Spearman, Kruskal-Wallis, lojistik regresyon, merkez etkisi (van Elteren), ROC ve çapraz doğrulamalı AUC, artımsal değer, duyarlılık analizleri. |
-| `scripts/requirements.txt` | Gerekli Python paketleri. |
+| `scripts/requirements.txt` | Gerekli Python paketleri (en düşük sürümler). |
+| `scripts/requirements_tam.txt` | Makaledeki analizlerin çalıştırıldığı ortamın tam paket sürümleri (`pip freeze`, Python 3.13.9). |
+| `scripts/makale_sekilleri.py` | Makale şekilleri 1-6 (Histopathology biçimi: 170,5 mm genişlik, 800/500 dpi TIFF ve PDF). Sonuç dosyalarını okur, yeni analiz yapmaz. |
+| `scripts/normallik_testi.py` | Shapiro-Wilk normallik testi (makalenin Data S1 dosyası üzerinde). |
 | `proje_ayarlari.json` | Rapordaki ana analizde kullanılan ayarlar (StarDist, 0,25 µm/piksel, slayt başına en fazla 500 tile). |
 | `02_raw_data/` | Vaka listesi Excel'inin konacağı klasör (bkz. `02_raw_data/README.md`). |
 
@@ -188,7 +193,7 @@ dosyalarındadır. Segmentasyon örnekleri her vaka için `qc_segmentation_examp
 ## 8. Notlar
 
 * Aynı Excel, aynı ayarlar ve aynı tohumlarla sonuçlar tekrarlanabilir. TensorFlow/StarDist sürümleri farklıysa
-  çekirdek sınırlarında küçük farklar olabilir. Kullanılan paket sürümleri `kurulum` çıktısında listelenir.
+  çekirdek sınırlarında küçük farklar olabilir. Kullanılan paket sürümleri `kurulum` çıktısında listelenir; makaledeki analizlerin tam sürümleri `scripts/requirements_tam.txt` dosyasındadır.
 * Doku maskesi tümör, stroma ve nekrozu ayırmaz. Lenfosit ve endotel çekirdekleri de ölçüme girer (raporda kısıtlılık olarak belirtilmiştir).
 * TCGA görüntüleri GDC Veri Portalı'ndan açık erişimle indirilir. MoNuSeg verisi CC BY-NC-SA 4.0 lisanslıdır.
 
@@ -215,6 +220,18 @@ python scripts/proje.py cptac-istatistik      # R2: CPTAC'ta birincil ilişkiler
 | R4 Tümör çekirdekleri | TCGA çekirdek tabloları | Lenfosit benzeri: alan ≤30 µm², eksantrisite ≤0,65, H yoğunluğu ≥ slayt %70'liği, 12 µm içinde ≥3 küçük komşu. Doğrulanmış sınıflandırıcı değildir; duyarlılık analizidir. |
 
 Ek bağımlılıklar: `lifelines` (R3), `idc-index` (R2). CPTAC DICOM slaytları OpenSlide ≥ 4.0 ile okunur.
+
+## 10. Makale şekilleri ve normallik testi
+
+Revizyon analizleri (bölüm 9) tamamlandıktan sonra:
+
+```bash
+python scripts/makale_sekilleri.py                       # Şekil 1-6 -> 08_figures/makale/
+python scripts/makale_sekilleri.py --sadece 2 --karolar <8 PNG>   # Şekil 2 doku panelleri (ham ve segmentasyonlu x 4)
+python scripts/normallik_testi.py Data_S1_case_level_measurements.xlsx
+```
+
+`makale_sekilleri.py` her şeklin dayandığı sayıları (r, ρ, AUC, log-rank P) ekrana yazar; bunlar makaledeki değerlerle aynı olmalıdır.
 
 ## Kaynak veri ve yöntemler
 
