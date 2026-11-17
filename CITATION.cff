@@ -5,9 +5,9 @@ authors:
   - family-names: Kelkit
     given-names: Gülnihal
     affiliation: Biruni Üniversitesi
-version: 1.0.0
+version: 1.0.1
+date-released: 2026-11-18
 doi: 10.5281/zenodo.24142864
-date-released: 2026-11-11
 license: MIT
 repository-code: "https://github.com/gulnihal222/nukleer-entropi-ccrcc"
 keywords:
