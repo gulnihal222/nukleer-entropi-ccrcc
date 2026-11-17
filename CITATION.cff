@@ -5,6 +5,11 @@ authors:
   - family-names: Kelkit
     given-names: Gülnihal
     affiliation: Biruni Üniversitesi
+    orcid: "https://orcid.org/0009-0006-1329-7562"
+  - family-names: Parlayan
+    given-names: Cüneyd
+    affiliation: Biruni Üniversitesi
+    orcid: "https://orcid.org/0000-0002-6183-9489"
 version: 1.0.1
 date-released: 2026-11-18
 doi: 10.5281/zenodo.24142864
