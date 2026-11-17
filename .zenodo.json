@@ -5,14 +5,13 @@
   "creators": [
     {
       "name": "Kelkit, Gülnihal",
-      "affiliation": "Biruni Üniversitesi"
-    }
-  ],
-  "contributors": [
+      "affiliation": "Biruni Üniversitesi",
+      "orcid": "0009-0006-1329-7562"
+    },
     {
       "name": "Parlayan, Cüneyd",
       "affiliation": "Biruni Üniversitesi",
-      "type": "Supervisor"
+      "orcid": "0000-0002-6183-9489"
     }
   ],
   "description": "H&E tüm slayt görüntülerinde StarDist ile çekirdek segmentasyonu, çekirdek alanı/çevresi/daireselliği/eksantrisitesinin Shannon entropisi ve tümör derecesiyle ilişkisi. TCGA-KIRC (200 hasta) ana analizi; CPTAC-CCRCC (221 hasta) dış doğrulama; sağkalım ve duyarlılık analizleri. TÜBİTAK 2209-A projesi.",
